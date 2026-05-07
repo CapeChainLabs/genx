@@ -1,0 +1,32 @@
+{
+  "name": "genx-mobile",
+  "version": "1.0.0",
+  "description": "GenX Mobile - Tap to Earn Mining App",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~51.0.0",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-native": "0.74.5",
+    "expo-ads-admob": "~14.0.0",
+    "expo-notifications": "~0.28.0",
+    "expo-secure-store": "~13.0.0",
+    "expo-purchases": "~7.0.0",
+    "react-native-gesture-handler": "~2.16.1",
+    "react-native-reanimated": "~3.10.1",
+    "react-native-svg": "15.2.0",
+    "@cosmjs/stargate": "^0.31.0",
+    "@cosmjs/proto-signing": "^0.31.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "typescript": "~5.3.0"
+  },
+  "private": true
+}
