@@ -1,0 +1,91 @@
+syntax = "proto3";
+package genx.creation.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/capechain/genx/x/creation/types";
+
+enum AssetType {
+  TOKEN = 0;
+  NFT_COLLECTION = 1;
+  MEME_COIN = 2;
+  CUSTOM_ASSET = 3;
+}
+
+enum BondingCurveType {
+  LINEAR = 0;
+  EXPONENTIAL = 1;
+  LOGARITHMIC = 2;
+  SIGMOID = 3;
+}
+
+message CreationTemplate {
+  string id = 1;
+  string name = 2;
+  AssetType asset_type = 3;
+  string description = 4;
+  repeated string required_fields = 5;
+  repeated string optional_fields = 6;
+  cosmos.base.v1beta1.Coin creation_fee = 7;
+}
+
+message ReferralInfo {
+  string referrer = 1;
+  string referee = 2;
+  string referrer_speed_boost = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  int64 referral_count = 4;
+  int64 total_rewards = 5;
+}
+
+message CreatedAsset {
+  string id = 1;
+  string creator = 2;
+  string asset_type = 3;
+  string name = 4;
+  string symbol = 5;
+  string description = 6;
+  string denom = 7;
+  string metadata_uri = 8;
+  int64 created_at = 9;
+  string royalty_percentage = 10 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  bool liquidation_protection = 11;
+  string bonding_curve_type = 12;
+}
+
+message Params {
+  cosmos.base.v1beta1.Coin token_creation_fee = 1;
+  cosmos.base.v1beta1.Coin nft_creation_fee = 2;
+  cosmos.base.v1beta1.Coin meme_creation_fee = 3;
+  string platform_fee_percentage = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  string royalty_default = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  string referral_boost_percentage = 6 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  string referral_reward_percentage = 7 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  uint64 max_assets_per_creator = 8;
+}
+
+message GenesisState {
+  Params params = 1;
+  repeated CreatedAsset created_assets = 2;
+  repeated ReferralInfo referrals = 3;
+  uint64 asset_count = 4;
+}

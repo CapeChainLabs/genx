@@ -1,0 +1,101 @@
+syntax = "proto3";
+package genx.creation.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "genx/creation/v1/genesis.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/capechain/genx/x/creation/types";
+
+service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/genx/creation/v1/params";
+  }
+
+  rpc AssetById(QueryAssetByIdRequest) returns (QueryAssetByIdResponse) {
+    option (google.api.http).get = "/genx/creation/v1/assets/{id}";
+  }
+
+  rpc AssetsByCreator(QueryAssetsByCreatorRequest) returns (QueryAssetsByCreatorResponse) {
+    option (google.api.http).get = "/genx/creation/v1/assets/creator/{creator}";
+  }
+
+  rpc Assets(QueryAssetsRequest) returns (QueryAssetsResponse) {
+    option (google.api.http).get = "/genx/creation/v1/assets";
+  }
+
+  rpc Referral(QueryReferralRequest) returns (QueryReferralResponse) {
+    option (google.api.http).get = "/genx/creation/v1/referrals/{referrer}/{referee}";
+  }
+
+  rpc ReferralsByReferrer(QueryReferralsByReferrerRequest) returns (QueryReferralsByReferrerResponse) {
+    option (google.api.http).get = "/genx/creation/v1/referrals/{referrer}";
+  }
+
+  rpc TotalAssets(QueryTotalAssetsRequest) returns (QueryTotalAssetsResponse) {
+    option (google.api.http).get = "/genx/creation/v1/total_assets";
+  }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  Params params = 1;
+}
+
+message QueryAssetByIdRequest {
+  string id = 1;
+}
+
+message QueryAssetByIdResponse {
+  CreatedAsset asset = 1;
+}
+
+message QueryAssetsByCreatorRequest {
+  string creator = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryAssetsByCreatorResponse {
+  repeated CreatedAsset assets = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryAssetsRequest {
+  string asset_type = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryAssetsResponse {
+  repeated CreatedAsset assets = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryReferralRequest {
+  string referrer = 1;
+  string referee = 2;
+}
+
+message QueryReferralResponse {
+  ReferralInfo referral = 1;
+}
+
+message QueryReferralsByReferrerRequest {
+  string referrer = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryReferralsByReferrerResponse {
+  repeated ReferralInfo referrals = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryTotalAssetsRequest {}
+
+message QueryTotalAssetsResponse {
+  uint64 total_assets = 1;
+  uint64 tokens = 2;
+  uint64 nfts = 3;
+  uint64 meme_coins = 4;
+}

@@ -1,0 +1,168 @@
+{
+    "chains": [
+        {
+            "name": "genx",
+            "chain_id": "localchain-1",
+            "docker_image": {
+                "repository": "genx",
+                "version": "local",
+                "uid-gid": ""
+            },
+            "gas_prices": "0.0ugenx",
+            "gas_adjustment": 2,
+            "genesis": {
+                "modify": [
+                    {
+                        "key": "app_state.gov.params.voting_period",
+                        "value": "10s"
+                    },
+                    {
+                        "key": "app_state.gov.params.max_deposit_period",
+                        "value": "10s"
+                    },
+                    {
+                        "key": "app_state.gov.params.min_deposit.0.denom",
+                        "value": "ugenx"
+                    },
+                    {
+                        "key": "app_state.gov.params.min_deposit.0.amount",
+                        "value": "1"
+                    }
+                ],
+                "accounts": [
+                    {
+                        "name": "acc0",
+                        "amount": "25000000000%DENOM%",
+                        "address": "genx1hj5fveer5cjtn4wd6wstzugjfdxzl0xp9c0aqv",
+                        "mnemonic": "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
+                    },
+                    {
+                        "name": "acc1",
+                        "amount": "24000000000%DENOM%",
+                        "address": "genx1efd63aw40lxf3n4mhf7dzhjkr453axurevuef9",
+                        "mnemonic": "wealth flavor believe regret funny network recall kiss grape useless pepper cram hint member few certain unveil rather brick bargain curious require crowd raise"
+                    },
+                    {
+                        "name": "user0",
+                        "amount": "100000%DENOM%",
+                        "address": "genx1tv7zjqphfkzrepd9jxgjlvhny7x7uzv909l64v",
+                        "mnemonic": "neutral already lazy purpose pool true trim mind sort cart journey apology cherry hospital obtain six balance wedding glue blame gaze page ill under"
+                    },
+                    {
+                        "name": "user1",
+                        "amount": "100000%DENOM%",
+                        "address": "genx1gnyq70msrgctyumv7esyhsuj8t5t8lh9dw08qc",
+                        "mnemonic": "copper enter napkin later cradle occur razor oppose kind unveil fossil melt prepare culture onion tragic manage prevent crumble armed inject jump lottery rail"
+                    }
+                ]
+            },
+            "config_file_overrides": [
+                {
+                    "file": "config/app.toml",
+                    "paths": {
+                        "api.enabled-unsafe-cors": true
+                    }
+                },
+                {
+                    "file": "config/config.toml",
+                    "paths": {
+                        "rpc.cors_allowed_origins": [
+                            "*"
+                        ]
+                    }
+                }
+            ],
+            "ibc_paths": [
+                "localchain-1_localchain-2"
+            ],
+            "number_vals": 1,
+            "number_node": 0,
+            "chain_type": "cosmos",
+            "coin_type": 118,
+            "binary": "genxd",
+            "bech32_prefix": "genx",
+            "denom": "ugenx",
+            "trusting_period": "336h",
+            "debugging": false,
+            "block_time": "2000ms",
+            "host_port_override": {
+                "1317": "1317",
+                "26656": "26656",
+                "26657": "26657",
+                "9090": "9090"
+            },
+            "ics_version_override": {}
+        },
+        {
+            "name": "genx",
+            "chain_id": "localchain-2",
+            "docker_image": {
+                "repository": "genx",
+                "version": "local",
+                "uid-gid": ""
+            },
+            "gas_prices": "0.0ugenx",
+            "gas_adjustment": 2,
+            "genesis": {
+                "modify": [
+                    {
+                        "key": "app_state.gov.params.voting_period",
+                        "value": "3s"
+                    },
+                    {
+                        "key": "app_state.gov.params.max_deposit_period",
+                        "value": "10s"
+                    },
+                    {
+                        "key": "app_state.gov.params.min_deposit.0.denom",
+                        "value": "ugenx"
+                    },
+                    {
+                        "key": "app_state.gov.params.min_deposit.0.amount",
+                        "value": "1"
+                    }
+                ],
+                "accounts": [
+                    {
+                        "name": "acc0",
+                        "amount": "25000000000%DENOM%",
+                        "address": "genx1hj5fveer5cjtn4wd6wstzugjfdxzl0xp9c0aqv",
+                        "mnemonic": "decorate bright ozone fork gallery riot bus exhaust worth way bone indoor calm squirrel merry zero scheme cotton until shop any excess stage laundry"
+                    },
+                    {
+                        "name": "acc1",
+                        "amount": "24000000000%DENOM%",
+                        "address": "genx1efd63aw40lxf3n4mhf7dzhjkr453axurevuef9",
+                        "mnemonic": "wealth flavor believe regret funny network recall kiss grape useless pepper cram hint member few certain unveil rather brick bargain curious require crowd raise"
+                    },
+                    {
+                        "name": "user0",
+                        "amount": "100000%DENOM%",
+                        "address": "genx1s5mv2j9a4mrhlywj7gr5jxnwcu2y76ump6raqr",
+                        "mnemonic": "more release execute item peasant pilot anger save march mushroom wild bottom fiction proof obey slender symbol busy dove film pause rule decade cabbage"
+                    },
+                    {
+                        "name": "user1",
+                        "amount": "100000%DENOM%",
+                        "address": "genx1z7whp9du8uf60wdhmk8qcm3qw5u9vwhksuj64z",
+                        "mnemonic": "abstract busy behind zebra more armed ghost neutral stamp sugar speed neutral nominee science burst script small join pool pet tribe hint frame exhaust"
+                    }
+                ]
+            },
+            "ibc_paths": [
+                "localchain-1_localchain-2"
+            ],
+            "number_vals": 1,
+            "number_node": 0,
+            "chain_type": "cosmos",
+            "coin_type": 118,
+            "binary": "genxd",
+            "bech32_prefix": "genx",
+            "denom": "ugenx",
+            "trusting_period": "336h",
+            "debugging": false,
+            "block_time": "2000ms",
+            "ics_version_override": {}
+        }
+    ]
+}

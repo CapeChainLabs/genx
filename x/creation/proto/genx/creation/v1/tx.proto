@@ -1,0 +1,105 @@
+syntax = "proto3";
+package genx.creation.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "genx/creation/v1/genesis.proto";
+
+option go_package = "github.com/capechain/genx/x/creation/types";
+
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc CreateToken(MsgCreateToken) returns (MsgCreateTokenResponse);
+  rpc CreateNftCollection(MsgCreateNftCollection) returns (MsgCreateNftCollectionResponse);
+  rpc CreateMemeCoin(MsgCreateMemeCoin) returns (MsgCreateMemeCoinResponse);
+  rpc RegisterReferral(MsgRegisterReferral) returns (MsgRegisterReferralResponse);
+  rpc ImportAsset(MsgImportAsset) returns (MsgImportAssetResponse);
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+}
+
+message MsgCreateToken {
+  option (cosmos.msg.v1.signer) = "sender";
+  string sender = 1;
+  string name = 2;
+  string symbol = 3;
+  string description = 4;
+  string initial_supply = 5;
+  uint64 decimals = 6;
+  string royalty_percentage = 7 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  bool liquidation_protection = 8;
+  string referrer = 9;
+}
+
+message MsgCreateTokenResponse {
+  string denom = 1;
+  string asset_id = 2;
+}
+
+message MsgCreateNftCollection {
+  option (cosmos.msg.v1.signer) = "sender";
+  string sender = 1;
+  string name = 2;
+  string symbol = 3;
+  string description = 4;
+  string metadata_uri = 5;
+  string royalty_percentage = 6 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  uint64 max_supply = 7;
+  bool liquidation_protection = 8;
+  string referrer = 9;
+}
+
+message MsgCreateNftCollectionResponse {
+  string class_id = 1;
+  string asset_id = 2;
+}
+
+message MsgCreateMemeCoin {
+  option (cosmos.msg.v1.signer) = "sender";
+  string sender = 1;
+  string name = 2;
+  string symbol = 3;
+  string description = 4;
+  string initial_supply = 5;
+  uint64 decimals = 6;
+  string bonding_curve_type = 7;
+  string launch_price = 8 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  bool liquidation_protection = 9;
+  string referrer = 10;
+}
+
+message MsgCreateMemeCoinResponse {
+  string denom = 1;
+  string asset_id = 2;
+}
+
+message MsgRegisterReferral {
+  option (cosmos.msg.v1.signer) = "referrer";
+  string referrer = 1;
+  string referee = 2;
+}
+
+message MsgRegisterReferralResponse {
+  string speed_boost = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  string authority = 1;
+  Params params = 2;
+}
+
+message MsgUpdateParamsResponse {}

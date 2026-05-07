@@ -1,0 +1,40 @@
+{
+  "$schema": "https://github.com/cosmos/chain-registry/blob/master/assetlist.schema.json",
+  "chain_name": "genx",
+  "assets": [
+    {
+      "description": "The native token of genx",
+      "denom_units": [
+        {
+          "denom": "ugenx",
+          "exponent": 0
+        },
+        {
+          "denom": "GENX",
+          "exponent": 6
+        }
+      ],
+      "base": "ugenx",
+      "name": "genx GENX",
+      "display": "genx",
+      "symbol": "GENX",
+      "logo_URIs": {
+        "png": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png",
+        "svg": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+      },
+      "images": [
+        {
+          "png": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png",
+          "svg": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+          "theme": {
+            "primary_color_hex": "#FF2D00"
+          }
+        }
+      ],
+      "socials": {
+        "website": "https://example.com",
+        "twitter": "https://x.com/cosmoshub"
+      }
+    }
+  ]
+}

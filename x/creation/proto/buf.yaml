@@ -1,0 +1,21 @@
+version: v1
+name: buf.build/capechain/genx
+deps:
+  - buf.build/cosmos/cosmos-proto
+  - buf.build/cosmos/cosmos-sdk
+  - buf.build/cosmos/gogo-proto
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - FILE_LOWER_SNAKE_CASE
+  except:
+    - SERVICE_SUFFIX
+    - FIELD_NOT_REPEATED
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
+  ignore:
+    - tendermint
+breaking:
+  use:
+    - FILE
