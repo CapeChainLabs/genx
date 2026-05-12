@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { GENX_CHAIN } from '../config/chain'
 
 const WalletContext = createContext()
@@ -14,12 +14,9 @@ export function WalletProvider({ children }) {
     balance: '0',
     loading: false,
     error: '',
-    pubKey: null,
   })
-  const [chain, setChain] = useState(GENX_CHAIN)
+  const [chain] = useState(GENX_CHAIN)
   const [balances, setBalances] = useState([])
-  const keplrListener = useRef(null)
-  const leapListener = useRef(null)
 
   const clearWalletState = useCallback(() => {
     setWallet({
@@ -31,7 +28,6 @@ export function WalletProvider({ children }) {
       balance: '0',
       loading: false,
       error: '',
-      pubKey: null,
     })
     setBalances([])
   }, [])
@@ -143,7 +139,6 @@ export function WalletProvider({ children }) {
         balance,
         loading: false,
         error: '',
-        pubKey: key.pubKey,
       })
     } catch (err) {
       setWallet(prev => ({
@@ -188,15 +183,15 @@ export function WalletProvider({ children }) {
   useEffect(() => {
     const pref = localStorage.getItem(WALLET_PREF_KEY)
     if (pref && window[pref]) {
-      connectWallet(pref)
+      connectWallet(pref).catch(() => {})
     }
   }, [])
 
   useEffect(() => {
     if (!wallet.isConnected) return
 
-    const handleAccountChange = async (walletType) => {
-      const key = await window[walletType].getKey(chain.chainId)
+    const handleKeplrChange = async () => {
+      const key = await window.keplr.getKey(chain.chainId)
       const balance = await fetchBalance(key.bech32Address)
       await fetchAllBalances(key.bech32Address)
       setWallet(prev => ({
@@ -204,24 +199,27 @@ export function WalletProvider({ children }) {
         address: key.address.toString(),
         bech32Address: key.bech32Address,
         balance,
-        pubKey: key.pubKey,
       }))
     }
 
-    if (window.keplr) {
-      keplrListener.current = window.keplr.addListener('accountsChanged', () => handleAccountChange('keplr'))
-    }
-    if (window.leap) {
-      leapListener.current = window.leap.addListener('accountsChanged', () => handleAccountChange('leap'))
+    const handleLeapChange = async () => {
+      const key = await window.leap.getKey(chain.chainId)
+      const balance = await fetchBalance(key.bech32Address)
+      await fetchAllBalances(key.bech32Address)
+      setWallet(prev => ({
+        ...prev,
+        address: key.address.toString(),
+        bech32Address: key.bech32Address,
+        balance,
+      }))
     }
 
+    window.addEventListener('keplr_keystorechange', handleKeplrChange)
+    window.addEventListener('leap_keystorechange', handleLeapChange)
+
     return () => {
-      if (keplrListener.current && window.keplr?.removeListener) {
-        window.keplr.removeListener('accountsChanged', keplrListener.current)
-      }
-      if (leapListener.current && window.leap?.removeListener) {
-        window.leap.removeListener('accountsChanged', leapListener.current)
-      }
+      window.removeEventListener('keplr_keystorechange', handleKeplrChange)
+      window.removeEventListener('leap_keystorechange', handleLeapChange)
     }
   }, [wallet.isConnected, chain.chainId, fetchBalance, fetchAllBalances])
 

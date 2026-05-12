@@ -1,3 +1,4 @@
+import { ErrorBoundary } from './components/ErrorBoundary.jsx'
 import { Header } from './components/Header.jsx'
 import { Hero } from './components/Hero.jsx'
 import { WalletConnect } from './components/WalletConnect.jsx'
@@ -16,10 +17,10 @@ function App() {
       <main>
         <Hero />
         {!wallet.isConnected && <WalletConnect />}
-        <CreateMode />
-        <Explore />
-        <Mining />
-        <Dashboard />
+        <ErrorBoundary name="CreateMode"><CreateMode /></ErrorBoundary>
+        <ErrorBoundary name="Explore"><Explore /></ErrorBoundary>
+        <ErrorBoundary name="Mining"><Mining /></ErrorBoundary>
+        <ErrorBoundary name="Dashboard"><Dashboard /></ErrorBoundary>
       </main>
       <footer className="footer">
         <p>GenX Blockchain — Build Different</p>
