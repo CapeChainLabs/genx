@@ -4,9 +4,9 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { QueryClient, setupBankExtension, setupStakingExtension } from '@cosmjs/stargate';
 import * as SecureStore from 'expo-secure-store';
 
-const GENX_CHAIN_ID = 'genx-local-1';
-const GENX_RPC = 'http://localhost:26657'; // Update with your RPC endpoint
-const GENX_REST = 'http://localhost:1317'; // Update with your REST endpoint
+const GENX_CHAIN_ID = 'genx';
+const GENX_RPC = 'http://92.4.128.172:26657';
+const GENX_REST = 'http://92.4.128.172:1317';
 
 export interface GenXWallet {
   address: string;

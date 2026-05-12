@@ -1,8 +1,8 @@
 export const GENX_CHAIN = {
-  chainId: 'localchain-1',
+  chainId: 'genx',
   chainName: 'GenX',
-  rpc: 'http://127.0.0.1:26657',
-  rest: 'http://127.0.0.1:1317',
+  rpc: 'http://92.4.128.172:26657',
+  rest: 'http://92.4.128.172:1317',
   bip44: {
     coinType: 118,
   },

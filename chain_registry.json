@@ -6,7 +6,7 @@
   "website": "https://example.com",
   "network_type": "testnet",
   "pretty_name": "Genx",
-  "chain_id": "localchain-1",
+  "chain_id": "genx",
   "bech32_prefix": "genx",
   "daemon_name": "genxd",
   "node_home": "$HOME/.genx",
@@ -79,14 +79,14 @@
   "apis": {
     "rpc": [
       {
-        "address": "http://127.0.0.1:26657",
-        "provider": "localhost"
+        "address": "http://92.4.128.172:26657",
+        "provider": "CapeChain Labs"
       }
     ],
     "rest": [
       {
-        "address": "http://127.0.0.1:1317",
-        "provider": "localhost"
+        "address": "http://92.4.128.172:1317",
+        "provider": "CapeChain Labs"
       }
     ]
   },

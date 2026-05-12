@@ -6,7 +6,6 @@ export function Dashboard() {
   const [mobileStats, setMobileStats] = useState(null);
 
   useEffect(() => {
-    // Load mobile mining stats from localStorage (synced from mobile)
     const stats = localStorage.getItem('genx_mobile_stats');
     if (stats) {
       setMobileStats(JSON.parse(stats));
@@ -14,16 +13,6 @@ export function Dashboard() {
   }, []);
 
   if (!wallet.isConnected) return null
-
-  const [mobileStats, setMobileStats] = useState(null);
-
-  useEffect(() => {
-    // Load mobile mining stats from localStorage (synced from mobile)
-    const stats = localStorage.getItem('genx_mobile_stats');
-    if (stats) {
-      setMobileStats(JSON.parse(stats));
-    }
-  }, []);
 
   return (
     <section id="dashboard" className="dashboard-section">
@@ -56,7 +45,7 @@ export function Dashboard() {
         <div className="dash-card">
           <h3>Network</h3>
           <p className="dash-value" style={{ fontSize: '18px', color: 'var(--neon-pink)' }}>GenX</p>
-          <p className="dash-sub">localchain-1</p>
+          <p className="dash-sub">genx</p>
         </div>
         
         {/* Mobile Mining Stats */}
