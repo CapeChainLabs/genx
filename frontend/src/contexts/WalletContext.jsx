@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { GENX_CHAIN, LEAP_SUGGEST_CHAIN } from '../config/chain'
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { GENX_CHAIN } from '../config/chain'
 
 const WalletContext = createContext()
+const WALLET_PREF_KEY = 'genx_wallet_type'
 
 export function WalletProvider({ children }) {
   const [wallet, setWallet] = useState({
@@ -10,10 +11,75 @@ export function WalletProvider({ children }) {
     isKeplr: false,
     isLeap: false,
     isConnected: false,
-    balance: '',
+    balance: '0',
     loading: false,
     error: '',
+    pubKey: null,
   })
+  const [chain, setChain] = useState(GENX_CHAIN)
+  const [balances, setBalances] = useState([])
+  const keplrListener = useRef(null)
+  const leapListener = useRef(null)
+
+  const clearWalletState = useCallback(() => {
+    setWallet({
+      address: '',
+      bech32Address: '',
+      isKeplr: false,
+      isLeap: false,
+      isConnected: false,
+      balance: '0',
+      loading: false,
+      error: '',
+      pubKey: null,
+    })
+    setBalances([])
+  }, [])
+
+  const getSigningClient = useCallback(async () => {
+    const { SigningStargateClient } = await import('@cosmjs/stargate')
+    const { GasPrice } = await import('@cosmjs/stargate')
+
+    let walletType = wallet.isKeplr ? 'keplr' : 'leap'
+    const offlineSigner = window[walletType].getOfflineSigner(chain.chainId)
+
+    const client = await SigningStargateClient.connectWithSigner(
+      chain.rpc,
+      offlineSigner,
+      { gasPrice: GasPrice.fromString('0.025ugenx') }
+    )
+    return client
+  }, [wallet.isKeplr, wallet.isLeap, chain.chainId, chain.rpc])
+
+  const getQueryClient = useCallback(async () => {
+    const { StargateClient } = await import('@cosmjs/stargate')
+    return await StargateClient.connect(chain.rpc)
+  }, [chain.rpc])
+
+  const fetchBalance = useCallback(async (address) => {
+    try {
+      const client = await getQueryClient()
+      const balance = await client.getBalance(address, 'ugenx')
+      const amount = (parseInt(balance.amount) / 1_000_000).toFixed(2)
+      return amount
+    } catch {
+      return '0'
+    }
+  }, [getQueryClient])
+
+  const fetchAllBalances = useCallback(async (address) => {
+    try {
+      const client = await getQueryClient()
+      const coins = await client.getAllBalances(address)
+      setBalances(coins.map(c => ({
+        denom: c.denom,
+        amount: (parseInt(c.amount) / 1_000_000).toString(),
+        raw: c.amount,
+      })))
+    } catch {
+      setBalances([])
+    }
+  }, [getQueryClient])
 
   const suggestChain = useCallback(async (walletType) => {
     const offlineSigner = window[walletType]
@@ -22,46 +88,24 @@ export function WalletProvider({ children }) {
     }
 
     try {
-      await offlineSigner.experimentalSuggestChain(LEAP_SUGGEST_CHAIN)
+      await offlineSigner.experimentalSuggestChain({
+        chainId: chain.chainId,
+        chainName: chain.chainName,
+        rpc: chain.rpc,
+        rest: chain.rest,
+        bip44: chain.bip44,
+        bech32Config: chain.bech32Config,
+        currencies: chain.currencies,
+        feeCurrencies: chain.feeCurrencies,
+        stakeCurrency: chain.stakeCurrency,
+        features: chain.features,
+      })
     } catch (e) {
       if (e.message && !e.message.includes('already exists')) {
         console.warn('Chain suggestion warning:', e.message)
       }
     }
-  }, [])
-
-  const getSigningClient = useCallback(async () => {
-    const { SigningStargateClient } = await import('@cosmjs/stargate')
-    const { GasPrice } = await import('@cosmjs/stargate')
-
-    let walletType = wallet.isKeplr ? 'keplr' : 'leap'
-    const offlineSigner = window[walletType].getOfflineSigner(GENX_CHAIN.chainId)
-
-    const client = await SigningStargateClient.connectWithSigner(
-      GENX_CHAIN.rpc,
-      offlineSigner,
-      {
-        gasPrice: GasPrice.fromString('0ugenx'),
-      }
-    )
-    return client
-  }, [wallet.isKeplr, wallet.isLeap])
-
-  const getQueryClient = useCallback(async () => {
-    const { StargateClient } = await import('@cosmjs/stargate')
-    return await StargateClient.connect(GENX_CHAIN.rpc)
-  }, [])
-
-  const fetchBalance = useCallback(async (address) => {
-    try {
-      const client = await getQueryClient()
-      const balance = await client.getBalance(address, GENX_CHAIN.feeCurrencies[0].coinMinimalDenom)
-      const amount = (parseInt(balance.amount) / Math.pow(10, GENX_CHAIN.feeCurrencies[0].coinDecimals)).toFixed(2)
-      return amount
-    } catch {
-      return '0'
-    }
-  }, [getQueryClient])
+  }, [chain])
 
   const connectWallet = useCallback(async (walletType) => {
     if (walletType !== 'keplr' && walletType !== 'leap') {
@@ -82,12 +126,13 @@ export function WalletProvider({ children }) {
 
     try {
       await suggestChain(walletType)
+      await offlineSigner.enable(chain.chainId)
+      const key = await offlineSigner.getKey(chain.chainId)
 
-      await offlineSigner.enable(GENX_CHAIN.chainId)
-
-      const key = await offlineSigner.getKey(GENX_CHAIN.chainId)
+      localStorage.setItem(WALLET_PREF_KEY, walletType)
 
       const balance = await fetchBalance(key.bech32Address)
+      await fetchAllBalances(key.bech32Address)
 
       setWallet({
         address: key.address.toString(),
@@ -98,6 +143,7 @@ export function WalletProvider({ children }) {
         balance,
         loading: false,
         error: '',
+        pubKey: key.pubKey,
       })
     } catch (err) {
       setWallet(prev => ({
@@ -106,35 +152,28 @@ export function WalletProvider({ children }) {
         error: err.message || 'Failed to connect wallet',
       }))
     }
-  }, [suggestChain, fetchBalance])
+  }, [suggestChain, fetchBalance, fetchAllBalances, chain.chainId])
 
   const disconnect = useCallback(() => {
-    setWallet({
-      address: '',
-      bech32Address: '',
-      isKeplr: false,
-      isLeap: false,
-      isConnected: false,
-      balance: '',
-      loading: false,
-      error: '',
-    })
-  }, [])
+    localStorage.removeItem(WALLET_PREF_KEY)
+    clearWalletState()
+  }, [clearWalletState])
 
   const refreshBalance = useCallback(async () => {
     if (wallet.bech32Address) {
       const balance = await fetchBalance(wallet.bech32Address)
+      await fetchAllBalances(wallet.bech32Address)
       setWallet(prev => ({ ...prev, balance }))
     }
-  }, [wallet.bech32Address, fetchBalance])
+  }, [wallet.bech32Address, fetchBalance, fetchAllBalances])
 
-  const sendTokens = useCallback(async (recipient, amount, denom) => {
+  const sendTokens = useCallback(async (recipient, amount, denom = 'ugenx') => {
     const client = await getSigningClient()
     const fee = {
-      amount: [{ denom: 'ugenx', amount: '0' }],
+      amount: [{ denom: 'ugenx', amount: '5000' }],
       gas: '200000',
     }
-    const coins = [{ denom: denom || 'ugenx', amount: Math.round(amount * 1000000).toString() }]
+    const coins = [{ denom, amount: Math.round(parseFloat(amount) * 1_000_000).toString() }]
     const result = await client.sendTokens(
       wallet.bech32Address,
       recipient,
@@ -142,40 +181,61 @@ export function WalletProvider({ children }) {
       fee,
       ''
     )
+    await refreshBalance()
     return result
-  }, [getSigningClient, wallet.bech32Address])
+  }, [getSigningClient, wallet.bech32Address, refreshBalance])
 
   useEffect(() => {
-    const checkAutoConnect = async () => {
-      if (window.keplr) {
-        try {
-          await connectWallet('keplr')
-          return
-        } catch {
-          // Silent fail
-        }
+    const pref = localStorage.getItem(WALLET_PREF_KEY)
+    if (pref && window[pref]) {
+      connectWallet(pref)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!wallet.isConnected) return
+
+    const handleAccountChange = async (walletType) => {
+      const key = await window[walletType].getKey(chain.chainId)
+      const balance = await fetchBalance(key.bech32Address)
+      await fetchAllBalances(key.bech32Address)
+      setWallet(prev => ({
+        ...prev,
+        address: key.address.toString(),
+        bech32Address: key.bech32Address,
+        balance,
+        pubKey: key.pubKey,
+      }))
+    }
+
+    if (window.keplr) {
+      keplrListener.current = window.keplr.addListener('accountsChanged', () => handleAccountChange('keplr'))
+    }
+    if (window.leap) {
+      leapListener.current = window.leap.addListener('accountsChanged', () => handleAccountChange('leap'))
+    }
+
+    return () => {
+      if (keplrListener.current && window.keplr?.removeListener) {
+        window.keplr.removeListener('accountsChanged', keplrListener.current)
       }
-      if (window.leap) {
-        try {
-          await connectWallet('leap')
-        } catch {
-          // Silent fail
-        }
+      if (leapListener.current && window.leap?.removeListener) {
+        window.leap.removeListener('accountsChanged', leapListener.current)
       }
     }
-    // Don't auto-connect on mount, let user choose
-  }, [])
+  }, [wallet.isConnected, chain.chainId, fetchBalance, fetchAllBalances])
 
   return (
     <WalletContext.Provider value={{
       wallet,
+      balances,
       connectWallet,
       disconnect,
       refreshBalance,
       sendTokens,
       getSigningClient,
       getQueryClient,
-      chain: GENX_CHAIN,
+      chain,
     }}>
       {children}
     </WalletContext.Provider>

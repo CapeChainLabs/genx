@@ -32,7 +32,7 @@ export async function createToken(sender, formData, getSigningClient) {
   }
 
   const fee = {
-    amount: [{ denom: 'stake', amount: '0' }],
+    amount: [{ denom: 'ugenx', amount: '5000' }],
     gas: '500000',
   }
 
@@ -58,7 +58,7 @@ export async function createNftCollection(sender, formData, getSigningClient) {
   }
 
   const fee = {
-    amount: [{ denom: 'stake', amount: '0' }],
+    amount: [{ denom: 'ugenx', amount: '5000' }],
     gas: '500000',
   }
 
@@ -85,7 +85,7 @@ export async function createMemeCoin(sender, formData, getSigningClient) {
   }
 
   const fee = {
-    amount: [{ denom: 'stake', amount: '0' }],
+    amount: [{ denom: 'ugenx', amount: '5000' }],
     gas: '500000',
   }
 
@@ -104,7 +104,7 @@ export async function registerReferral(referrer, referee, getSigningClient) {
   }
 
   const fee = {
-    amount: [{ denom: 'stake', amount: '0' }],
+    amount: [{ denom: 'ugenx', amount: '2000' }],
     gas: '200000',
   }
 

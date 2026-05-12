@@ -9,6 +9,7 @@ function formatAddress(address) {
 export function Header() {
   const { wallet, connectWallet, disconnect } = useWallet()
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showMobileNav, setShowMobileNav] = useState(false)
 
   return (
     <header className="header">
@@ -17,25 +18,31 @@ export function Header() {
           <div className="logo-icon">G</div>
           <h1>GenX</h1>
         </a>
-        <nav className="nav">
-          <a href="#create">Create</a>
-          <a href="#explore">Explore</a>
-          <a href="#dashboard">Dashboard</a>
+
+        <button className="mobile-menu-btn" onClick={() => setShowMobileNav(!showMobileNav)}>
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <nav className={`nav ${showMobileNav ? 'nav-open' : ''}`}>
+          <a href="#create" onClick={() => setShowMobileNav(false)}>Create</a>
+          <a href="#explore" onClick={() => setShowMobileNav(false)}>Explore</a>
+          <a href="#mining" onClick={() => setShowMobileNav(false)}>Mining</a>
+          <a href="#dashboard" onClick={() => setShowMobileNav(false)}>Dashboard</a>
         </nav>
+
         <div className="wallet-section">
           {wallet.isConnected ? (
             <div className="wallet-connected">
-              <button
-                className="wallet-btn"
-                onClick={() => setShowDropdown(!showDropdown)}
-              >
+              <button className="wallet-btn" onClick={() => setShowDropdown(!showDropdown)}>
                 <span className="wallet-icon" />
                 <span>{formatAddress(wallet.bech32Address)}</span>
                 <span className="balance">{wallet.balance} GENX</span>
               </button>
               {showDropdown && (
                 <div className="wallet-dropdown">
-                  <button onClick={() => { disconnect(); setShowDropdown(false) }}>
+                  <button onClick={() => { disconnect(); setShowDropdown(false); setShowMobileNav(false) }}>
                     Disconnect
                   </button>
                 </div>
@@ -43,11 +50,8 @@ export function Header() {
             </div>
           ) : (
             <div className="wallet-connect-wrapper">
-              <button
-                className="connect-btn"
-                onClick={() => setShowDropdown(!showDropdown)}
-              >
-                <span>Connect Wallet</span>
+              <button className="connect-btn" onClick={() => setShowDropdown(!showDropdown)}>
+                Connect Wallet
               </button>
               {showDropdown && (
                 <div className="wallet-dropdown">
